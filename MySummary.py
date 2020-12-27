@@ -62,11 +62,15 @@ if num_wins > 0: #if they've won any of their leagues
     second_place = mini_leagues[points_off_top.index(biggest_win)]['standings']['results'][1]['player_name']
     print(f"Out of all of your mini leagues, you managed to win {num_wins} of them!")
     time.sleep(3)
-    print(f"That's impressive, you won {','.join(leagues_won)}!")
+    print(f"That's impressive, you won {', '.join(leagues_won)}!")
+    print()
     time.sleep(3)
     print(f"Your biggest win came in {biggest_win_league_name} where you won by {-biggest_win} points!")
+    print()
     time.sleep(3)
     print(f"Make sure to tell {second_place} that you beat them to the title in that one...")
+    print()
+    time.sleep(3)
 
 else:
     closest = min([p for p in points_off_top if p >=0])
@@ -75,9 +79,35 @@ else:
     print("So...you didn't win any of your mini-leagues this year")
     time.sleep(3)
     print(f"You came closest in {closest_league_name[0]} where you were {closest} points off of {winner} in first!")
+    print()
     time.sleep(3)
     if closest <=10:
         print("So close! You'll have to get payback next year!")
+        print()
     elif closest > 100:
         print("More than 100 points off...maybe more work needed for next year")
+        print()
+    time.sleep(3)
 
+### Best GW
+gw_points = [gw['points'] for gw in manager.getSummaryGWData()['current']]
+best_gw_points_index = gw_points.index(max(gw_points)) + 1
+best_gw_points = max(gw_points)
+
+gw_ranks = [gw['rank'] for gw in manager.getSummaryGWData()['current']]
+best_gw_rank_index = gw_ranks.index(min(gw_ranks)) + 1
+best_gw_rank = min(gw_ranks)
+
+print("Now lets look at the highlights of your season!")
+time.sleep(3)
+print(f"Your highest number of points in a single GW of the year came in GW{best_gw_points_index} "
+      f"where you scored {best_gw_points} points!")
+print()
+time.sleep(3)
+if best_gw_points_index == best_gw_rank_index:
+    print(f"GW{best_gw_rank_index} was also saw your highest rank in a GW where you finished {best_gw_rank} overall!")
+    print()
+else:
+    print(f"However, GW{best_gw_rank_index} wasn't your best week when it comes to rank...in GW{best_gw_rank_index} you "
+          f"were {best_gw_rank} overall!")
+    print()
