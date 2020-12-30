@@ -5,6 +5,7 @@ import time
 from overall import *
 from math import log10, floor
 import numpy as np
+from collections import Counter
 
 manager_id = input('What is your FPL ID?')
 manager = Manager(manager_id, range(1,14))
@@ -111,3 +112,22 @@ else:
     print(f"However, GW{best_gw_rank_index} wasn't your best week when it comes to rank...in GW{best_gw_rank_index} you "
           f"were {best_gw_rank} overall!")
     print()
+time.sleep(3)
+
+#Hits
+hits = manager.getHits()
+total_hits = sum(hits)
+counts_hits = Counter(hits)
+hits_values = counts_hits.keys()
+print("As you know, you are only allowed one transfer each week, now let's look at how many points hits you had to take...")
+time.sleep(3)
+print(f"The points hits you took this season totalled {-total_hits} points")
+time.sleep(3)
+
+if len(counts_hits) > 0:
+    print("This was composed of:")
+    time.sleep(3)
+    for key in hits_values:
+        if key!=0:
+            print(f"{counts_hits[key]}x {key} point hits")
+            time.sleep(3)
