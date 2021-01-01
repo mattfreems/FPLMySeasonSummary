@@ -43,7 +43,7 @@ class Manager:
 
         for chip in chips:
             if chip['name'] == 'wildcard' or chip['name'] == 'freehit':
-                transfers[chip['event']-1] = chip['name']
+                transfers[(chip['event']-1)] = chip['name']
         return transfers
 
     def getDetailedGWData(self):

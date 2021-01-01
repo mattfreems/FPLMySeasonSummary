@@ -8,7 +8,7 @@ import numpy as np
 from collections import Counter
 
 manager_id = input('What is your FPL ID?')
-manager = Manager(manager_id, range(1,14))
+manager = Manager(manager_id, (1,16))
 manager_name = manager.getName()
 
 ### Overall points
@@ -130,4 +130,61 @@ if len(counts_hits) > 0:
     for key in hits_values:
         if key!=0:
             print(f"{counts_hits[key]}x {key} point hits")
+            print()
             time.sleep(3)
+else:
+    print("No points hits this season! Impressive!")
+    print()
+
+#which hit was the best/worst
+#investigate transfers where hits were taken
+
+hits_gw = [h>0 for h in hits]
+hits_benefit = []
+hits_details = [manager.getTransferData()[i] if x else False for i, x in enumerate(hits_gw)]
+in_transfers_players = []
+out_transfers_players = []
+
+for i, hit in enumerate(hits_details):
+    if hit:
+        in_transfers_pts = []
+        out_transfers_pts = []
+        for ids in hit['in']['id']:
+            in_transfers_pts.append(Player(ids).getSingleGWData(i+1)['total_points'])
+        for ids in hit['out']['id']:
+            out_transfers_pts.append(Player(ids).getSingleGWData(i+1)['total_points'])
+        hits_benefit.append(sum(in_transfers_pts) - hits[i] - sum(out_transfers_pts))
+        in_transfers_players.append(hit['in']['name'])
+        out_transfers_players.append(hit['out']['name'])
+    else:
+        hits_benefit.append(False)
+        in_transfers_players.append(False)
+        out_transfers_players.append(False)
+
+worst_hit = min([h for h in hits_benefit if not False])
+worst_hit_week = hits_benefit.index(worst_hit) + 1
+worst_week_in_players = in_transfers_players[hits_benefit.index(worst_hit)]
+worst_week_out_players = out_transfers_players[hits_benefit.index(worst_hit)]
+
+best_hit = max([h for h in hits_benefit if not False])
+best_hit_week = hits_benefit.index(best_hit) + 1
+best_week_in_players = in_transfers_players[hits_benefit.index(best_hit)]
+best_week_out_players = out_transfers_players[hits_benefit.index(best_hit)]
+
+
+
+print("Sometimes hits go to plan, sometimes they don't...")
+time.sleep(3)
+print(f"Your most successful hit was in GW {best_hit_week}")
+print(f"In this week you transferred out {', and '.join([' '.join(tups) for tups in best_week_out_players])} ")
+print(f"for {', and '.join([' '.join(tups) for tups in best_week_in_players])}. ")
+print(f"Including the hit, you were {best_hit} points better off!")
+print()
+print()
+time.sleep(5)
+
+print(f"Your least successful hit was in GW {worst_hit_week}")
+print(f"In this week you transferred out {', and '.join([' '.join(tups) for tups in worst_week_out_players])} ")
+print(f"for {', and '.join([' '.join(tups) for tups in worst_week_in_players])}. ")
+print(f"Including the hit, you were {-worst_hit} points worse off!")
+
