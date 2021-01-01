@@ -7,8 +7,10 @@ from math import log10, floor
 import numpy as np
 from collections import Counter
 
+current_gw = 16
+
 manager_id = input('What is your FPL ID?')
-manager = Manager(manager_id, (1,16))
+manager = Manager(manager_id, (1,current_gw))
 manager_name = manager.getName()
 
 ### Overall points
@@ -172,9 +174,9 @@ best_week_in_players = in_transfers_players[hits_benefit.index(best_hit)]
 best_week_out_players = out_transfers_players[hits_benefit.index(best_hit)]
 
 
-
 print("Sometimes hits go to plan, sometimes they don't...")
 time.sleep(3)
+print()
 print(f"Your most successful hit was in GW {best_hit_week}")
 print(f"In this week you transferred out {', and '.join([' '.join(tups) for tups in best_week_out_players])} ")
 print(f"for {', and '.join([' '.join(tups) for tups in best_week_in_players])}. ")
@@ -187,4 +189,57 @@ print(f"Your least successful hit was in GW {worst_hit_week}")
 print(f"In this week you transferred out {', and '.join([' '.join(tups) for tups in worst_week_out_players])} ")
 print(f"for {', and '.join([' '.join(tups) for tups in worst_week_in_players])}. ")
 print(f"Including the hit, you were {-worst_hit} points worse off!")
+print()
 
+# Best period of the season
+gw_averages = np.array(getAverageGWScores((1, current_gw)))
+manager_gw_scores = np.array([gw['points'] for gw in manager.getSummaryGWData()['current']])
+diffs = np.subtract(manager_gw_scores, gw_averages)
+
+partial_sum = sum(diffs[:5])
+max_sum = partial_sum
+max_ind = 0
+min_sum = partial_sum
+min_ind = 0
+
+for i, x in enumerate(diffs):
+    if i+5 >= len(diffs):
+        break
+    partial_sum = partial_sum - x + diffs[i+5]
+    if partial_sum > max_sum:
+        max_sum = partial_sum
+        max_ind = i+1
+    if partial_sum < min_sum:
+        min_sum = partial_sum
+        min_ind = i+1
+
+overall_rank_progression = manager.getRanks()
+overall_rank_progression.insert(0, 'the start') #insert 0 at the beginning of the list so that element at i is the rank before that GW started
+
+best_period_min = max_ind
+best_period_max = max_ind + 4
+best_period_rank_from = overall_rank_progression[max_ind]
+best_period_rank_to = overall_rank_progression[max_ind+5]
+
+worst_period_min = min_ind
+worst_period_max = min_ind + 4
+worst_period_rank_from = overall_rank_progression[min_ind]
+worst_period_rank_to = overall_rank_progression[min_ind+5]
+
+print("Each season is filled with many ups and downs...now we'll see your best and worst periods of the season!")
+time.sleep(5)
+print(f"Your best five week period of the season came between GW {best_period_min+1}-{best_period_max+1}")
+time.sleep(5)
+if max_sum > 0:
+    print(f"In this period you were a total of {max_sum} points better than the average, and your rank went from {best_period_rank_from} to {best_period_rank_to}!")
+else:
+    print(f"Even though it was your best period, in this period you were a total of {max_sum} points worse than the average, and your rank went from {best_period_rank_from} to {best_period_rank_to}!")
+time.sleep(5)
+
+print(f"Your worst five week period of the season game between GW {worst_period_min+1}-{worst_period_max+1}")
+time.sleep(5)
+if min_sum > 0:
+    print(f"Even though it was your worst five week period you were still a total of {min_sum} points more than the average. Your rank went from {worst_period_rank_from} to {worst_period_rank_to}")
+else:
+    print(f"In this period you were a total of {min_sum} points worse than the average, and your rank went from {worst_period_rank_from} to {worst_period_rank_to}")
+time.sleep(5)
